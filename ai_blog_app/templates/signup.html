@@ -21,11 +21,16 @@
         <div class="bg-white p-8 shadow-md rounded-lg max-w-md w-full">
             <form class="space-y-4" action="" method='POST'>
                 {% csrf_token %}
-                <div>
-                    <h2>
-                        {{ error_message }}
-                    </h2>
-                </div>
+
+
+                {% if error_message %}
+                
+                    <div align="center" style="color:red">
+                        <h2>
+                            {{ error_message }}
+                        </h2>
+                    </div>
+                {% endif %}
                 <h2 class="text-xl font-semibold">Signup</h2>
                 <div>
                     <label for="username" class="block font-medium mb-1">Username</label>
