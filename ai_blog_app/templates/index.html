@@ -85,6 +85,7 @@
              <section class="mt-10 flex-grow">
                 <h2 class="text-xl mb-4 font-semibold">Generate Blog Article </h2>
                 <div id="blogContent" class="mt-2 text-gray-700 space-y-4">
+                    <!-- here goes the content of the blog -->
                   
                 </div>
              </section>
@@ -94,5 +95,42 @@
     <footer class="text-center p-4 text-black mt-6">
         Powered by <a href="https://github.com/ABHISHEKGHARAMI">Abhishek Gharami</a>
     </footer>
+    <script>
+        document.getElementById('generateBlogButton').addEventListener('click', async()=>{
+            // getting the data from the from
+            const youtubeLink = document.getElementById('youtubeLink').value;
+            const blogContent = document.getElementById('blogContent');
+
+            // now check that if that is the proper youtube link is given
+            if(youtubeLink){
+                // start the loading thing
+                document.getElementById('loading-cycle').style.display = 'block';
+                // clear the previous chat
+                blogContent.innerHTML = '';
+                const endpointUrl = '/generate_blog';
+
+                // get the data from the fetch point
+                try{
+                    const response = await fetch(endpointUrl,{
+                        method : 'POST',
+                        headers : {
+                            'Content-Type': 'application/json',
+                        },
+                        body : JSON.stringify({link:youtubeLink})
+                    });
+                    const data = await response.json();
+                    blogContent.innerHTML = data.content;
+                }catch(error){
+                    console.log('error occurred:',error);
+                    alert('something went wrong!!')
+                    
+                }
+                // close the loading cycle
+                document.getElementById('loading-cycle').style.display = 'none';
+            }else{
+                alert('Please enter a video link!!');
+            }
+        });
+    </script>
 </body>
 </html>

@@ -9,7 +9,9 @@ def index(request):
     return render(request,
                   'index.html')
 
-
+# for generate the blog
+def generate_blog(request):
+    pass
 # login view
 def user_login(request):
     if request.method == 'POST':
