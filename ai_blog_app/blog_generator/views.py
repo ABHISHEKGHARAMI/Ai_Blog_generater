@@ -2,6 +2,9 @@ from django.shortcuts import render , redirect
 from django.contrib.auth.models import User
 from django.contrib.auth import login,authenticate,logout
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
+import json
 
 # Create your views here.
 @login_required
@@ -10,8 +13,30 @@ def index(request):
                   'index.html')
 
 # for generate the blog
+@csrf_exempt
 def generate_blog(request):
-    pass
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            yt_link = data['link']
+            return JsonResponse({'content':yt_link})
+        except {KeyError,JSONDecodeError}:
+            return JsonResponse({
+            'error':'invalid data sent'
+        },status=400)
+            
+            
+        '''
+        get the title of the video
+        get the transcript of the video
+        get the blog using the openApi
+        save the blog in the database
+        return the blog as json response 
+        '''
+    else:
+        return JsonResponse({
+            'error':'invalid request method'
+        },status=405)
 # login view
 def user_login(request):
     if request.method == 'POST':
