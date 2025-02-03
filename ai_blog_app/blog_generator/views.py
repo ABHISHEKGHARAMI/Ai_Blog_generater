@@ -1,8 +1,10 @@
 from django.shortcuts import render , redirect
 from django.contrib.auth.models import User
 from django.contrib.auth import login,authenticate,logout
+from django.contrib.auth.decorators import login_required
 
 # Create your views here.
+@login_required
 def index(request):
     return render(request,
                   'index.html')
@@ -18,7 +20,7 @@ def user_login(request):
             login(request,user)
             return redirect('/')
         else:
-            error_message = 'unfortunately this user does not exist...'
+            error_message = 'unfortunately username or password does not match'
             return render(request,'login.html',
                           {
                               'error_message':error_message
@@ -57,5 +59,6 @@ def user_signup(request):
 
 # logout view
 def user_logout(request):
-    pass
+    logout(request)
+    return redirect('/')
 
