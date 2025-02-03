@@ -19,8 +19,17 @@
     <!-- main content -->
      <div class="flex items-center justify-center h-screen">
         <div class="bg-white p-8 shadow-md rounded-lg max-w-md w-full">
-          <form class="space-y-4">
+          <form class="space-y-4" method='POST' action=''>
+            {% csrf_token %}
             <h2 class="text-xl font-semibold">Login Form</h2>
+            {% if error_message %}
+                
+                    <div align="center" style="color:red">
+                        <h2>
+                            {{ error_message }}
+                        </h2>
+                    </div>
+            {% endif %}
             <div>
                 <label for="username" class="block font-medium mb-1">Username</label>
                 <input type="text" id="username" name="username" placeholder="Enter your username...."
