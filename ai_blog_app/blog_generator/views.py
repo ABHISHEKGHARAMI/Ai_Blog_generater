@@ -9,7 +9,7 @@ from pytube import YouTube
 from django.conf import settings
 import os
 import assemblyai as aai
-import openai
+from openai import OpenAI
 import yt_dlp
 
 # Create your views here.
@@ -68,37 +68,47 @@ def yt_title(link):
     except Exception as e:
         title = "Error fetching title"
         print(f"Error fetching YouTube title: {e}")
+        
+    # print(title)
 
     return title
 # download the audio of the video
+
+
 def download_audio(link):
+    ffmpeg_path = '/usr/bin/ffmpeg'  # Make sure this is the correct path to ffmpeg
+
     ydl_opts = {
-        'format': 'bestaudio/best',  # Choose the best audio format
-        'extractaudio': True,  # Only extract audio, no video
-        # Output template with file name in MEDIA_ROOT
+        'ffmpeg_location': ffmpeg_path,  # Specify the ffmpeg path
+        'format': 'bestaudio/best',  # Best audio format available
+        # Save file in MEDIA_ROOT
         'outtmpl': os.path.join(settings.MEDIA_ROOT, '%(id)s.%(ext)s'),
         'postprocessors': [{
-            'key': 'FFmpegAudioConvertor',  # Convert to mp3 using FFmpeg
-            'preferredcodec': 'mp3',  # Output format mp3
-            'preferredquality': '192',  # Quality setting
+            'key': 'FFmpegExtractAudio',  # Extract audio using FFmpeg
+            'preferredcodec': 'mp3',  # Convert to mp3
+            'preferredquality': '192',  # Set audio quality
         }],
-        'quiet': True,  # Suppress output
+        'quiet': False,  # Change to False for debugging
     }
 
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info_dict = ydl.extract_info(
                 link, download=True)  # Download the audio
-            file_path = ydl.prepare_filename(
-                info_dict)  # Get the temporary file path
-            # Change extension to .mp3
-            mp3_file = file_path.replace(info_dict['ext'], 'mp3')
-            os.rename(file_path, mp3_file)  # Rename to mp3
+            # Get the output path
+            mp3_file = os.path.join(
+                settings.MEDIA_ROOT, f"{info_dict['id']}.mp3")
+
+            if os.path.exists(mp3_file):
+                print(f"Download successful: {mp3_file}")
+                return mp3_file
+            else:
+                print("Download failed: File not found")
+                return None
+
     except Exception as e:
         print(f"Error downloading audio: {e}")
-        mp3_file = None
-        
-    return mp3_file
+        return None
 
 #  transcript for the audio file
 def get_transcription(link):
@@ -107,22 +117,24 @@ def get_transcription(link):
     transcriber = aai.Transcriber()
     transcript = transcriber.transcribe(audio_file)
     
+    # print(transcript.text)
     return transcript.text
 
 # get the blog from the transcript
 def get_blog_from_transcription(transcription):
-    openai.api_key = settings.OPENAI_API_KEY
-    prompt = f"Based on the following transcript from a YouTube video, write a comprehensive blog article, write it based on the transcript, but dont make it look like a youtube video, make it look like a proper blog article:\n\n{transcription}\n\nArticle:"
+    # client = OpenAI(api_key=settings.OPENAI_API_KEY)
+    # prompt = f"Based on the following transcript from a YouTube video, write a comprehensive blog article, write it based on the transcript, but dont make it look like a youtube video, make it look like a proper blog article:\n\n{transcription}\n\nArticle:"
     
-    response = openai.Completion.create(
-        model="text-davinci-003",
-        prompt=prompt,
-        max_tokens=1000
-    )
+    # response = client.chat.completions.create(
+    #     model="gpt-3.5-turbo",
+    #     messages=[{"role": "user", "content": prompt}],
+    #     max_tokens=100
+    # )
 
-    generated_content = response.choices[0].text.strip()
+    # generated_content = response.choices[0].message.content.strip()
+    # print(generated_content)
 
-    return generated_content
+    return transcription
 
 # login view
 def user_login(request):
