@@ -9,6 +9,7 @@ from pytube import YouTube
 from django.conf import settings
 import os
 import assemblyai as aai
+import openai
 
 # Create your views here.
 @login_required
@@ -69,6 +70,17 @@ def get_transcription(link):
     transcript = transcriber.transcribe(audio_file)
     
     return transcriber.text
+
+# get the blog from the transcript
+def get_blog_from_transcription(transcription):
+    openai.api_key = settings.OPENAI_API_KEY
+    
+    prompt = f"Based on the following transcript from a YouTube video, write a comprehensive blog article, 
+    write it based on the transcript, but dont make it look like a youtube video, make it look 
+    like a proper blog article:\n\n{transcription}\n\nArticle:"
+    
+    
+
 # login view
 def user_login(request):
     if request.method == 'POST':
