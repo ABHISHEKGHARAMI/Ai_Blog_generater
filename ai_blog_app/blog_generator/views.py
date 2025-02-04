@@ -10,6 +10,7 @@ from django.conf import settings
 import os
 import assemblyai as aai
 import openai
+import yt_dlp
 
 # Create your views here.
 @login_required
@@ -55,23 +56,49 @@ def generate_blog(request):
         
 # func for yt title
 def yt_title(link):
-    yt = YouTube(link)
+    ydl_opts = {
+        'quiet': True,  # Suppress output
+        'extract_flat': True  # Only extract metadata (no download)
+    }
+
     try:
-        title = yt.title
-    except KeyError as e:
-        # Handle the error, perhaps log it and return a default title or an error message
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            info_dict = ydl.extract_info(link, download=False)
+            title = info_dict.get('title', 'No title found')
+    except Exception as e:
         title = "Error fetching title"
         print(f"Error fetching YouTube title: {e}")
+
     return title
 # download the audio of the video
 def download_audio(link):
-    yt = YouTube(link)
-    video = yt.streams.filter(only_audio=True).first()
-    out_file = video.download(output_path=settings.MEDIA_ROOT)
-    base , ext = os.path.splitext(out_file)
-    new_file = base + '.mp3'
-    os.rename(out_file,new_file)
-    return new_file
+    ydl_opts = {
+        'format': 'bestaudio/best',  # Choose the best audio format
+        'extractaudio': True,  # Only extract audio, no video
+        # Output template with file name in MEDIA_ROOT
+        'outtmpl': os.path.join(settings.MEDIA_ROOT, '%(id)s.%(ext)s'),
+        'postprocessors': [{
+            'key': 'FFmpegAudioConvertor',  # Convert to mp3 using FFmpeg
+            'preferredcodec': 'mp3',  # Output format mp3
+            'preferredquality': '192',  # Quality setting
+        }],
+        'quiet': True,  # Suppress output
+    }
+
+    try:
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            info_dict = ydl.extract_info(
+                link, download=True)  # Download the audio
+            file_path = ydl.prepare_filename(
+                info_dict)  # Get the temporary file path
+            # Change extension to .mp3
+            mp3_file = file_path.replace(info_dict['ext'], 'mp3')
+            os.rename(file_path, mp3_file)  # Rename to mp3
+    except Exception as e:
+        print(f"Error downloading audio: {e}")
+        mp3_file = None
+        
+    return mp3_file
 
 #  transcript for the audio file
 def get_transcription(link):
