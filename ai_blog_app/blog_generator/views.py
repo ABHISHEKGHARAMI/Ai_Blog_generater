@@ -42,6 +42,12 @@ def generate_blog(request):
         transcription = get_transcription(yt_link)
         if not transcription:
             return JsonResponse({'error':'failed to get transcription..'},status=500)
+        
+        blog_content = get_blog_from_transcription(transcription)
+        if not blog_content:
+            return JsonResponse({'error': 'failed to generate blog ..'}, status=500)
+        
+        return JsonResponse({'content':blog_content})
     else:
         return JsonResponse({
             'error':'invalid request method'
@@ -74,12 +80,17 @@ def get_transcription(link):
 # get the blog from the transcript
 def get_blog_from_transcription(transcription):
     openai.api_key = settings.OPENAI_API_KEY
+    prompt = f"Based on the following transcript from a YouTube video, write a comprehensive blog article, write it based on the transcript, but dont make it look like a youtube video, make it look like a proper blog article:\n\n{transcription}\n\nArticle:"
     
-    prompt = f"Based on the following transcript from a YouTube video, write a comprehensive blog article, 
-    write it based on the transcript, but dont make it look like a youtube video, make it look 
-    like a proper blog article:\n\n{transcription}\n\nArticle:"
-    
-    
+    response = openai.Completion.create(
+        model="text-davinci-003",
+        prompt=prompt,
+        max_tokens=1000
+    )
+
+    generated_content = response.choices[0].text.strip()
+
+    return generated_content
 
 # login view
 def user_login(request):
