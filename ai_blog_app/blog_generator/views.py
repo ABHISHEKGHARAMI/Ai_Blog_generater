@@ -8,6 +8,7 @@ import json
 from pytube import YouTube
 from django.conf import settings
 import os
+import assemblyai as aai
 
 # Create your views here.
 @login_required
@@ -22,7 +23,7 @@ def generate_blog(request):
         try:
             data = json.loads(request.body)
             yt_link = data['link']
-            return JsonResponse({'content':yt_link})
+            
         except {KeyError,JSONDecodeError}:
             return JsonResponse({
             'error':'invalid data sent'
@@ -37,6 +38,9 @@ def generate_blog(request):
         return the blog as json response 
         '''
         title = yt_title(yt_link)
+        transcription = get_transcription(yt_link)
+        if not transcription:
+            return JsonResponse({'error':'failed to get transcription..'},status=500)
     else:
         return JsonResponse({
             'error':'invalid request method'
@@ -56,6 +60,15 @@ def download_audio(link):
     new_file = base + '.mp3'
     os.rename(out_file,new_file)
     return new_file
+
+#  transcript for the audio file
+def get_transcription(link):
+    audio_file = download_audio(link)
+    aai.settings.api_key = settings.ASSEMBLY_API_KEY
+    transcriber = aai.Transcriber()
+    transcript = transcriber.transcribe(audio_file)
+    
+    return transcriber.text
 # login view
 def user_login(request):
     if request.method == 'POST':
