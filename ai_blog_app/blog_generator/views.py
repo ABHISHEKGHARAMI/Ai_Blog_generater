@@ -7,6 +7,7 @@ from django.http import JsonResponse
 import json
 from pytube import YouTube
 from django.conf import settings
+import os
 
 # Create your views here.
 @login_required
@@ -51,6 +52,10 @@ def download_audio(link):
     yt = YouTube(link)
     video = yt.streams.filter(only_audio=True).first()
     out_file = video.download(output_path=settings.MEDIA_ROOT)
+    base , ext = os.path.splitext(out_file)
+    new_file = base + '.mp3'
+    os.rename(out_file,new_file)
+    return new_file
 # login view
 def user_login(request):
     if request.method == 'POST':
