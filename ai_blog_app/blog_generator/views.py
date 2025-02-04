@@ -56,7 +56,12 @@ def generate_blog(request):
 # func for yt title
 def yt_title(link):
     yt = YouTube(link)
-    title = yt.title
+    try:
+        title = yt.title
+    except KeyError as e:
+        # Handle the error, perhaps log it and return a default title or an error message
+        title = "Error fetching title"
+        print(f"Error fetching YouTube title: {e}")
     return title
 # download the audio of the video
 def download_audio(link):
@@ -75,7 +80,7 @@ def get_transcription(link):
     transcriber = aai.Transcriber()
     transcript = transcriber.transcribe(audio_file)
     
-    return transcriber.text
+    return transcript.text
 
 # get the blog from the transcript
 def get_blog_from_transcription(transcription):
