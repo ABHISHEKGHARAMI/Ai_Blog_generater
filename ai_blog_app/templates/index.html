@@ -52,9 +52,13 @@
         <div>
             <h1 class="text-3xl font-bold">Ai Blog Generator</h1>
         </div>
-        <div>
-            <a href="#" class="text-white hover:underline">Welcome {{ user.username }}</a>
-            <a href="{% url 'logout' %}" class="text-white hover:underline">logout</a>
+        <div class="flex space-x-8">
+            <div>
+                <a href="#" class="text-white hover:underline">Dashboard</a>
+                <a href="{% url 'generate-list' %}" class="text-white hover:underline">BlogList</a>
+                <a href="#" class="text-white hover:underline">Welcome {{ user.username }}</a>
+                <a href="{% url 'logout' %}" class="text-white hover:underline">logout</a>
+            </div>
         </div>
     </nav>
     <br>
