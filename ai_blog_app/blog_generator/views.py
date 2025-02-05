@@ -158,8 +158,8 @@ def user_list_view(request):
 
 # article view for the generated article full detail
 def user_blog_detail_view(request,pk):
-    blog = get_object_or_404(BlogPost,id=pk)
-    if request.user == blog.user:
+    blog = BlogPost.objects.filter(id=pk)
+    if blog is not None:
         return render(request,'blog-detais.html',
             {
             'blog':blog
