@@ -158,7 +158,7 @@ def user_list_view(request):
 
 # article view for the generated article full detail
 def user_blog_detail_view(request,pk):
-    blog = BlogPost.objects.filter(id=pk)
+    blog = BlogPost.objects.get(id=pk)
     if blog is not None:
         return render(request,'blog-detais.html',
             {
