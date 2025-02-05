@@ -11,7 +11,7 @@ import os
 import assemblyai as aai
 from openai import OpenAI
 import yt_dlp
-
+from .models import BlogPost
 # Create your views here.
 @login_required
 def index(request):
@@ -47,6 +47,17 @@ def generate_blog(request):
         blog_content = get_blog_from_transcription(transcription)
         if not blog_content:
             return JsonResponse({'error': 'failed to generate blog ..'}, status=500)
+        
+        
+        # save the data to the database
+        new_blog_article = BlogPost.objects.create(
+            user = request.user,
+            youtube_title = title,
+            youtube_link = yt_link,
+            generated_text = blog_content
+        )
+        
+        new_blog_article.save()
         
         return JsonResponse({'content':blog_content})
     else:
