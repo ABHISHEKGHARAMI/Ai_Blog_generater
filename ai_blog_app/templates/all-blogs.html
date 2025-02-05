@@ -27,7 +27,7 @@
                 <div class="space-y-4">
                     {% for article in blog_article %}
                         <div class="border border-gray-300 p-4 rounded-lg">
-                            <h3 class="text-lg font-semibold">{{ article.youtube_title }}</h3>
+                            <h3 class="text-lg font-semibold"><a href="{% url 'generate-detail/{{article.id}}' %}" class="hover:underline">{{ article.youtube_title }}</a></h3>
                             <p>{{ article.generated_text | truncatewords:50 }}</p>
                         </div>
                     {% endfor %}

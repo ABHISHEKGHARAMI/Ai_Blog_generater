@@ -1,4 +1,4 @@
-from django.shortcuts import render , redirect
+from django.shortcuts import render , redirect , get_object_or_404
 from django.contrib.auth.models import User
 from django.contrib.auth import login,authenticate,logout
 from django.contrib.auth.decorators import login_required
@@ -157,8 +157,16 @@ def user_list_view(request):
                   })
 
 # article view for the generated article full detail
-def user_blog_detail_view(request):
-    pass
+def user_blog_detail_view(request,pk):
+    blog = get_object_or_404(BlogPost,id=pk)
+    if request.user == blog.user:
+        return render(request,'blog-detais.html',
+            {
+            'blog':blog
+             }
+            )
+    else:
+        return redirect('/')
 # login view
 def user_login(request):
     if request.method == 'POST':
