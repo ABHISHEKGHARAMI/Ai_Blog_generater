@@ -23,10 +23,12 @@
             <section>
                 <h2 class="text-xl mb-4 font-semibold">All Blog posts</h2>
                 <div class="space-y-4">
-                  <div class="border border-gray-300 p-4 rounded-lg">
-                    <h3 class="text-lg font-semibold">Blog post title</h3>
-                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quia, atque temporibus nam harum nulla eaque ipsum iure inventore corrupti cum, veniam, aut vel quo quasi quos perspiciatis nisi reprehenderit. Reiciendis?</p>
-                  </div>
+                    {% for article in blog_article %}
+                        <div class="border border-gray-300 p-4 rounded-lg">
+                            <h3 class="text-lg font-semibold">{{ article.title }}</h3>
+                            <p>{{ article.generated_text | truncatewords : 50 }}</p>
+                        </div>
+                    {% endfor %}
                 </div>
             </section>
         </div>

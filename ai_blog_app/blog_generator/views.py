@@ -147,6 +147,18 @@ def get_blog_from_transcription(transcription):
 
     return transcription
 
+#  list view for the user generated view
+def user_list_view(request):
+    blog_article = BlogPost.objects.filter(user=request.user)
+    return render(request,
+                  'all-blogs.html',
+                  {
+                      'blog_article': blog_article
+                  })
+
+# article view for the generated article full detail
+def user_blog_detail_view(request):
+    pass
 # login view
 def user_login(request):
     if request.method == 'POST':
