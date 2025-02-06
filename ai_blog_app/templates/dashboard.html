@@ -14,7 +14,9 @@
             <h1 class="text-3xl font-bold">Ai Blog Generator</h1>
         </div>
         <div>
-            <a href="#" class="text-white hover:underline">logout</a>
+            <a href="/" class="text-white hover:underline">Home</a>
+            <a href="{% url 'logout' %}" class="text-white hover:underline">logout</a>
+            
         </div>
     </nav>
     <!-- main content for graph -->
@@ -26,7 +28,7 @@
         </div>
     
         <!-- Chart.js Graph -->
-        <div class="mt-6">
+        <div class="mt-4 border-2 border-gray-400 rounded-lg p-2 w-50 h-60">
             <canvas id="postsGraph"></canvas>
         </div>
     
@@ -34,7 +36,7 @@
     <script>
         // prepare the data for the plot to show
         const months = {{ months | safe}};
-        const postCount = {{ post_counts | safe }};
+        const postCounts = {{ post_counts | safe }};
         // generate the plot
         const ctx = document.getElementById('postsGraph').getContext('2d');
         new Chart(ctx,{
