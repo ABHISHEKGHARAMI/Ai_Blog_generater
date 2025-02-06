@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DashBoard</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-100 font-sans antialiased">
+    <!-- navbar -->
+    <nav class="bg-blue-600 p-4 text-white flex justify-between">
+        <div>
+            <h1 class="text-3xl font-bold">Ai Blog Generator</h1>
+        </div>
+        <div>
+            <a href="#" class="text-white hover:underline">logout</a>
+        </div>
+    </nav>
+    <!-- main content for graph -->
+    <div class="container mx-auto p-6">
+        <h2 class="text-2xl font-bold mb-4">Dashboard</h2>
+        <div class="bg-white p-4 rounded-lg shadow-lg">
+            <h3 class="text-xl mb-2">Total Posts Generated in {{ current_year }}</h3>
+            <p class="text-2xl font-semibold">{{ total_posts }}</p>
+        </div>
+    
+        <!-- Chart.js Graph -->
+        <div class="mt-6">
+            <canvas id="postsGraph"></canvas>
+        </div>
+    
+    </div>
+    <script>
+        // prepare the data for the plot to show
+        const months = {{ months | safe}};
+        const postCount = {{ post_counts | safe }};
+        // generate the plot
+        const ctx = document.getElementById('postsGraph').getContext('2d');
+        new Chart(ctx,{
+            type : 'bar',
+            data: {
+                labels: months,
+                datasets: [{
+                    label: 'Blog Posts per Month',
+                    data: postCounts,
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    fill: true,
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        })
+    </script>
+</body>
+</html>
