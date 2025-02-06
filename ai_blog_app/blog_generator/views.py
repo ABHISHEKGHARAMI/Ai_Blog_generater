@@ -12,6 +12,9 @@ import assemblyai as aai
 from openai import OpenAI
 import yt_dlp
 from .models import BlogPost
+from django.utils import timezone
+from django.db.models import Count
+import calender
 # Create your views here.
 @login_required
 def index(request):
@@ -219,3 +222,29 @@ def user_logout(request):
     logout(request)
     return redirect('/')
 
+# dashboard view for the user
+def dashboard(request):
+    # get the current year
+    current_year = timezone.now().year
+    
+    # Fetch the number of posts for each month of the current year
+    posts_per_month = BlogPost.objects.filter(user=request.user,created__at=current_year).values(create_at__month).annotate(post_count=Count('id')).order_by('created_at__month')
+    
+    months = [calendar.month_name[month] for month in range(1, 13)]
+    post_counts = [0] * 12  # Default to 0 for all months
+    
+    # Fill the post counts for the months with data
+    for post in posts_per_month:
+        month_index = post['created_at__month'] - 1  # Convert to zero-indexed
+        post_counts[month_index] = post['post_count']
+        
+        
+    context = {
+        'total_posts': sum(post_counts),
+        'post_counts': post_counts,
+        'months': months,
+    }
+    
+    return render(request,
+                  'dashboard.html',
+                  context)
